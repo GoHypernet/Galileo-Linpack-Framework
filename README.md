@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://github.com/GoHypernet/Galileo-Linpack-Framework/blob/main/netlib-logo.jpg" width="100">
+</p>
+
 # Galileo-Linpack-Framework
 
 Repository containing a containerized version of Netlibs Linpack benchmark. In order to run a benchmark job, you will need a
