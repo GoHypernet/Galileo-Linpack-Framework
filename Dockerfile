@@ -1,30 +1,27 @@
-FROM ubuntu:18.04
+FROM debian:stretch-backports
+ARG ARCH=porthos
+ARG HPL_VERSION=2.3
+ARG HPL_TAR_GZ=https://www.netlib.org/benchmark/hpl/hpl-${HPL_VERSION}.tar.gz
 
-WORKDIR /root
 RUN apt-get update -y
 RUN apt-get install -y \
-  build-essential \
-  libbz2-dev \
-  python3 \
-  python3-dev \
-  python3-pip \
-  libblas-dev \
-  mpich \
-  libmpich-dev \
-  gawk \ 
-  vim \
-  && pip3 install --upgrade pip
+    libibverbs1=16.0-1~bpo9+1 \
+    libibverbs-dev=16.0-1~bpo9+1 \
+    build-essential \
+    libopenblas-dev \
+    libopenmpi2 \
+    libopenmpi-dev \
+    ibverbs-utils \
+    openmpi-bin \
+    gfortran \
+    openssh-client
 
-ADD hpl-2.3.tar.gz .
+ADD ${HPL_TAR_GZ} hpl.tar.gz
+RUN tar -xzf hpl.tar.gz && \
+    mv hpl-${HPL_VERSION} /root/hpl && \
+    rm hpl.tar.gz
+COPY Make.${ARCH} /root/hpl
 
-WORKDIR /root/hpl-2.3/setup
-RUN bash make_generic \
-  && mv Make.UNKNOWN Make.linux \
-  && sed -i 's/\/hpl/\/hpl-2.3/g' Make.linux \
-  && sed -i 's/UNKNOWN/linux/g' Make.linux 
-  
-WORKDIR /root/hpl-2.3
-RUN ln -s setup/Make.linux Make.linux \
-  && make arch=linux
-  
-WORKDIR /root/hpl-2.3/bin/linux
+RUN cd /root/hpl && make arch=${ARCH}
+
+WORKDIR /root/hpl/bin/${ARCH}
